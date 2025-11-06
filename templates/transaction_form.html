@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6">
+    <div class="card shadow">
+      <div class="card-header bg-primary text-white">
+        <!-- Adicionando ícones ao título -->
+        <h4 class="mb-0">
+          {% if transacao %}
+            <i class="fas fa-edit me-2"></i>Editar Transação
+          {% else %}
+            <i class="fas fa-plus-circle me-2"></i>Nova Transação
+          {% endif %}
+        </h4>
+      </div>
+      <div class="card-body p-4">
+        <form method="POST">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          
+          <div class="mb-3">
+            <label for="descricao" class="form-label"><i class="fas fa-file-alt me-2"></i>Descrição</label>
+            <input type="text" class="form-control" id="descricao" name="descricao" 
+                   placeholder="Ex: Compra no supermercado"
+                   value="{{ transacao.descricao if transacao else '' }}" required minlength="2" maxlength="200">
+          </div>
+
+          <div class="mb-3">
+            <label for="valor" class="form-label"><i class="fas fa-dollar-sign me-2"></i>Valor (R$)</label>
+            <input type="number" step="0.01" class="form-control" id="valor" name="valor" 
+                   placeholder="0.00"
+                   value="{{ transacao.valor if transacao else '' }}" required min="0.01" max="999999999">
+          </div>
+
+          <div class="mb-3">
+            <label for="tipo" class="form-label"><i class="fas fa-exchange-alt me-2"></i>Tipo</label>
+            <select class="form-select" id="tipo" name="tipo" required>
+              <option value="receita" {% if transacao and transacao.tipo == 'receita' %}selected{% endif %}>
+                <i class="fas fa-arrow-up"></i> Receita
+              </option>
+              <option value="despesa" {% if transacao and transacao.tipo == 'despesa' %}selected{% endif %}>
+                <i class="fas fa-arrow-down"></i> Despesa
+              </option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="categoria" class="form-label"><i class="fas fa-tags me-2"></i>Categoria</label>
+            <select class="form-select" id="categoria_select" name="categoria" onchange="toggleCategoriaCustomizada()">
+              <option value="">Selecione uma categoria</option>
+              <optgroup label="Despesas">
+                <option value="Alimentação" {% if transacao and transacao.categoria == 'Alimentação' %}selected{% endif %}>🍽️ Alimentação</option>
+                <option value="Transporte" {% if transacao and transacao.categoria == 'Transporte' %}selected{% endif %}>🚗 Transporte</option>
+                <option value="Saúde" {% if transacao and transacao.categoria == 'Saúde' %}selected{% endif %}>❤️ Saúde</option>
+                <option value="Educação" {% if transacao and transacao.categoria == 'Educação' %}selected{% endif %}>🎓 Educação</option>
+                <option value="Moradia" {% if transacao and transacao.categoria == 'Moradia' %}selected{% endif %}>🏠 Moradia</option>
+                <option value="Lazer" {% if transacao and transacao.categoria == 'Lazer' %}selected{% endif %}>🎮 Lazer</option>
+                <option value="Vestuário" {% if transacao and transacao.categoria == 'Vestuário' %}selected{% endif %}>👔 Vestuário</option>
+                <option value="Contas" {% if transacao and transacao.categoria == 'Contas' %}selected{% endif %}>📄 Contas</option>
+              </optgroup>
+              <optgroup label="Receitas">
+                <option value="Salário" {% if transacao and transacao.categoria == 'Salário' %}selected{% endif %}>💰 Salário</option>
+                <option value="Freelance" {% if transacao and transacao.categoria == 'Freelance' %}selected{% endif %}>💼 Freelance</option>
+                <option value="Investimentos" {% if transacao and transacao.categoria == 'Investimentos' %}selected{% endif %}>📈 Investimentos</option>
+                <option value="Vendas" {% if transacao and transacao.categoria == 'Vendas' %}selected{% endif %}>🛒 Vendas</option>
+                <option value="Bônus" {% if transacao and transacao.categoria == 'Bônus' %}selected{% endif %}>🎁 Bônus</option>
+              </optgroup>
+              <option value="outra">✏️ Outra (personalizada)</option>
+            </select>
+          </div>
+
+          <div class="mb-3" id="categoria_customizada_div" style="display: none;">
+            <label for="categoria_customizada" class="form-label"><i class="fas fa-pen me-2"></i>Digite a categoria personalizada</label>
+            <input type="text" class="form-control" id="categoria_customizada" placeholder="Ex: Pets, Doações, etc." maxlength="50">
+          </div>
+
+          <div class="mb-3">
+            <label for="data" class="form-label"><i class="fas fa-calendar-alt me-2"></i>Data</label>
+            <input type="date" class="form-control" id="data" name="data" 
+                   value="{{ transacao.data.strftime('%Y-%m-%d') if transacao else '' }}" required>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary flex-grow-1">
+              {% if transacao %}
+                <i class="fas fa-save me-2"></i>Atualizar
+              {% else %}
+                <i class="fas fa-plus me-2"></i>Adicionar
+              {% endif %}
+            </button>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+              <i class="fas fa-times me-2"></i>Cancelar
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  window.addEventListener('DOMContentLoaded', function() {
+    const categoriaAtual = "{{ transacao.categoria if transacao else '' }}";
+    const categoriaSelect = document.getElementById('categoria_select');
+    const opcoesPredefinidas = Array.from(categoriaSelect.options).map(opt => opt.value);
+    
+    if (categoriaAtual && !opcoesPredefinidas.includes(categoriaAtual)) {
+      categoriaSelect.value = 'outra';
+      document.getElementById('categoria_customizada_div').style.display = 'block';
+      document.getElementById('categoria_customizada').value = categoriaAtual;
+    }
+  });
+
+  function toggleCategoriaCustomizada() {
+    const select = document.getElementById('categoria_select');
+    const customDiv = document.getElementById('categoria_customizada_div');
+    const customInput = document.getElementById('categoria_customizada');
+    
+    if (select.value === 'outra') {
+      customDiv.style.display = 'block';
+      customInput.required = true;
+      customInput.focus();
+    } else {
+      customDiv.style.display = 'none';
+      customInput.required = false;
+      customInput.value = '';
+    }
+  }
+
+  document.querySelector('form').addEventListener('submit', function(e) {
+    const select = document.getElementById('categoria_select');
+    const customInput = document.getElementById('categoria_customizada');
+    
+    if (select.value === 'outra' && customInput.value.trim()) {
+      const hiddenInput = document.createElement('input');
+      hiddenInput.type = 'hidden';
+      hiddenInput.name = 'categoria';
+      hiddenInput.value = customInput.value.trim();
+      this.appendChild(hiddenInput);
+      
+      select.removeAttribute('name');
+    }
+  });
+</script>
+{% endblock %}

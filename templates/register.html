@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6 col-lg-5">
+    <div class="card shadow">
+      <div class="card-body p-4">
+        <!-- Adicionando ícones e melhorando layout -->
+        <h2 class="text-center mb-4"><i class="fas fa-user-plus me-2"></i>Cadastro</h2>
+        <form method="POST">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          
+          <div class="mb-3">
+            <label for="nome" class="form-label"><i class="fas fa-user me-2"></i>Nome completo</label>
+            <input class="form-control" type="text" id="nome" name="nome" placeholder="Digite seu nome completo" required minlength="2">
+          </div>
+          
+          <div class="mb-3">
+            <label for="email" class="form-label"><i class="fas fa-envelope me-2"></i>E-mail</label>
+            <input class="form-control" type="email" id="email" name="email" placeholder="seu@email.com" required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="senha" class="form-label"><i class="fas fa-lock me-2"></i>Senha</label>
+            <input class="form-control" type="password" id="senha" name="senha" placeholder="Crie uma senha forte" required minlength="8" 
+                   pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?&quot;:{}|<>]).{8,}"
+                   title="A senha deve ter no mínimo 8 caracteres, incluindo maiúsculas, minúsculas, números e caracteres especiais">
+          </div>
+          
+          <!-- Melhorando visual das dicas de senha -->
+          <div class="alert alert-info mb-3" style="font-size: 0.85rem;">
+            <i class="fas fa-info-circle me-2"></i><strong>Requisitos da senha:</strong>
+            <ul class="mb-0 mt-2" style="padding-left: 1.2rem;">
+              <li><i class="fas fa-check-circle text-success me-1"></i>Mínimo de 8 caracteres</li>
+              <li><i class="fas fa-check-circle text-success me-1"></i>Pelo menos uma letra maiúscula (A-Z)</li>
+              <li><i class="fas fa-check-circle text-success me-1"></i>Pelo menos uma letra minúscula (a-z)</li>
+              <li><i class="fas fa-check-circle text-success me-1"></i>Pelo menos um número (0-9)</li>
+              <li><i class="fas fa-check-circle text-success me-1"></i>Pelo menos um caractere especial (!@#$%^&*)</li>
+            </ul>
+          </div>
+          
+          <button class="btn btn-success w-100 mb-3">
+            <i class="fas fa-user-plus me-2"></i>Cadastrar
+          </button>
+          
+          <p class="text-center mb-0">
+            Já tem conta? <a href="{{ url_for('login') }}"><i class="fas fa-sign-in-alt me-1"></i>Entre</a>
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

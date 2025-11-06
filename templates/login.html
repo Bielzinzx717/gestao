@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6 col-lg-4">
+    <div class="card shadow">
+      <div class="card-body p-4">
+        <h2 class="text-center mb-4"><i class="fas fa-sign-in-alt me-2"></i>Login</h2>
+        <form method="POST">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          
+          <div class="mb-3">
+            <label for="email" class="form-label"><i class="fas fa-envelope me-2"></i>E-mail</label>
+            <input class="form-control" type="email" id="email" name="email" placeholder="seu@email.com" required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="senha" class="form-label"><i class="fas fa-lock me-2"></i>Senha</label>
+            <input class="form-control" type="password" id="senha" name="senha" placeholder="Digite sua senha" required>
+          </div>
+          
+          <button class="btn btn-primary w-100 mb-3">
+            <i class="fas fa-sign-in-alt me-2"></i>Entrar
+          </button>
+          
+          <p class="text-center mb-0">
+            Não tem conta? <a href="{{ url_for('register') }}"><i class="fas fa-user-plus me-1"></i>Cadastre-se</a>
+          </p>
+        </form>
+      </div>
+    </div>
+    
+    <div class="alert alert-info mt-3" style="font-size: 0.85rem;">
+      <i class="fas fa-shield-alt me-2"></i>
+      <strong>Segurança:</strong> Por motivos de segurança, há um limite de 10 tentativas de login por hora.
+    </div>
+  </div>
+</div>
+{% endblock %}

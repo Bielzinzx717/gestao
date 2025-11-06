@@ -1,0 +1,326 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2><i class="fas fa-chart-line me-2"></i>Olá, {{ current_user.nome }}!</h2>
+</div>
+
+<!-- Adicionando ícones nas estatísticas -->
+<div class="row mb-4">
+  <div class="col-md-6 mb-3 mb-md-0">
+    <div class="card">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Top 5 Categorias de Gastos (Mês Atual)</h5>
+      </div>
+      <div class="card-body">
+        {% if estatisticas.top_categorias %}
+          <ul class="list-group">
+            {% for item in estatisticas.top_categorias %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span>
+                <!-- Adicionando ícones por categoria -->
+                {% if item.categoria == 'Alimentação' %}
+                  <i class="fas fa-utensils category-icon text-primary"></i>
+                {% elif item.categoria == 'Transporte' %}
+                  <i class="fas fa-car category-icon text-info"></i>
+                {% elif item.categoria == 'Moradia' %}
+                  <i class="fas fa-home category-icon text-success"></i>
+                {% elif item.categoria == 'Saúde' %}
+                  <i class="fas fa-heartbeat category-icon text-danger"></i>
+                {% elif item.categoria == 'Educação' %}
+                  <i class="fas fa-graduation-cap category-icon text-warning"></i>
+                {% elif item.categoria == 'Lazer' %}
+                  <i class="fas fa-gamepad category-icon text-purple"></i>
+                {% elif item.categoria == 'Salário' %}
+                  <i class="fas fa-money-bill-wave category-icon text-success"></i>
+                {% elif item.categoria == 'Investimentos' %}
+                  <i class="fas fa-chart-line category-icon text-info"></i>
+                {% else %}
+                  <i class="fas fa-tag category-icon text-secondary"></i>
+                {% endif %}
+                {{ item.categoria }}
+              </span>
+              <span class="badge bg-danger rounded-pill">R$ {{ item.total|round(2) }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-muted mb-0"><i class="fas fa-info-circle me-2"></i>Nenhuma despesa registrada neste mês.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header bg-info text-white">
+        <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Comparação Mensal</h5>
+      </div>
+      <div class="card-body">
+        <h6><i class="fas fa-calendar-day me-2"></i>Mês Atual ({{ estatisticas.comparacao_mensal.mes_atual }})</h6>
+        <p class="mb-1">Receitas: <strong class="text-success"><i class="fas fa-arrow-up me-1"></i>R$ {{ estatisticas.comparacao_mensal.receitas_atual|round(2) }}</strong></p>
+        <p class="mb-3">Despesas: <strong class="text-danger"><i class="fas fa-arrow-down me-1"></i>R$ {{ estatisticas.comparacao_mensal.despesas_atual|round(2) }}</strong></p>
+        
+        <h6><i class="fas fa-calendar-minus me-2"></i>Mês Anterior ({{ estatisticas.comparacao_mensal.mes_anterior }})</h6>
+        <p class="mb-1">Receitas: <strong class="text-success"><i class="fas fa-arrow-up me-1"></i>R$ {{ estatisticas.comparacao_mensal.receitas_anterior|round(2) }}</strong></p>
+        <p class="mb-3">Despesas: <strong class="text-danger"><i class="fas fa-arrow-down me-1"></i>R$ {{ estatisticas.comparacao_mensal.despesas_anterior|round(2) }}</strong></p>
+        
+        <hr>
+        <h6><i class="fas fa-exchange-alt me-2"></i>Variação</h6>
+        <p class="mb-1">
+          Receitas: 
+          {% if estatisticas.comparacao_mensal.variacao_receitas >= 0 %}
+            <span class="text-success"><i class="fas fa-arrow-up me-1"></i>+R$ {{ estatisticas.comparacao_mensal.variacao_receitas|round(2) }}</span>
+          {% else %}
+            <span class="text-danger"><i class="fas fa-arrow-down me-1"></i>R$ {{ estatisticas.comparacao_mensal.variacao_receitas|round(2) }}</span>
+          {% endif %}
+        </p>
+        <p class="mb-0">
+          Despesas: 
+          {% if estatisticas.comparacao_mensal.variacao_despesas >= 0 %}
+            <span class="text-danger"><i class="fas fa-arrow-up me-1"></i>+R$ {{ estatisticas.comparacao_mensal.variacao_despesas|round(2) }}</span>
+          {% else %}
+            <span class="text-success"><i class="fas fa-arrow-down me-1"></i>R$ {{ estatisticas.comparacao_mensal.variacao_despesas|round(2) }}</span>
+          {% endif %}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row mb-4">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header bg-warning">
+        <h5 class="mb-0"><i class="fas fa-crystal-ball me-2"></i>Previsão de Gastos</h5>
+      </div>
+      <div class="card-body">
+        <p class="mb-2"><i class="fas fa-info-circle me-2"></i>Baseado no seu ritmo de gastos atual, a previsão para o final do mês é:</p>
+        <h4 class="text-danger mb-3"><i class="fas fa-exclamation-triangle me-2"></i>R$ {{ estatisticas.previsao_gastos|round(2) }}</h4>
+        <p class="text-muted mb-0"><i class="fas fa-chart-bar me-2"></i>Média de despesas dos últimos 3 meses: <strong>R$ {{ estatisticas.media_despesas_3meses|round(2) }}</strong></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Melhorando cards de resumo com ícones -->
+<div class="row mb-3">
+  <div class="col-md-4 mb-3 mb-md-0">
+    <div class="card text-bg-success text-center">
+      <div class="card-body">
+        <i class="fas fa-arrow-up fa-2x mb-2"></i>
+        <h5>Receitas</h5>
+        <p class="fs-4 mb-0">R$ {{ total_receitas|round(2) }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 mb-3 mb-md-0">
+    <div class="card text-bg-danger text-center">
+      <div class="card-body">
+        <i class="fas fa-arrow-down fa-2x mb-2"></i>
+        <h5>Despesas</h5>
+        <p class="fs-4 mb-0">R$ {{ total_despesas|round(2) }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card text-bg-primary text-center">
+      <div class="card-body">
+        <i class="fas fa-wallet fa-2x mb-2"></i>
+        <h5>Saldo</h5>
+        <p class="fs-4 mb-0">R$ {{ saldo|round(2) }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Melhorando botões de ação com ícones -->
+<div class="mb-3 d-flex flex-wrap gap-2">
+  <a href="{{ url_for('nova_transacao') }}" class="btn btn-success">
+    <i class="fas fa-plus-circle me-2"></i>Nova Transação
+  </a>
+  
+  <div class="btn-group" role="group">
+    <a href="{{ url_for('export_csv', data_inicial=data_inicial_str, data_final=data_final_str, tipo=filtro_tipo, categoria=filtro_categoria, busca=filtro_busca) }}" 
+       class="btn btn-outline-primary">
+      <i class="fas fa-file-csv me-2"></i>Exportar CSV
+    </a>
+    <a href="{{ url_for('export_pdf', data_inicial=data_inicial_str, data_final=data_final_str, tipo=filtro_tipo, categoria=filtro_categoria, busca=filtro_busca) }}" 
+       class="btn btn-outline-danger">
+      <i class="fas fa-file-pdf me-2"></i>Exportar PDF
+    </a>
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-header">
+    <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filtros Avançados</h5>
+  </div>
+  <div class="card-body">
+    <form method="GET" action="{{ url_for('dashboard') }}" class="row g-3">
+      <div class="col-md-3">
+        <label for="busca" class="form-label"><i class="fas fa-search me-2"></i>Buscar por descrição</label>
+        <input type="text" class="form-control" id="busca" name="busca" placeholder="Digite para buscar..." value="{{ filtro_busca or '' }}" maxlength="100">
+      </div>
+      
+      <div class="col-md-2">
+        <label for="tipo" class="form-label"><i class="fas fa-list me-2"></i>Tipo</label>
+        <select class="form-select" id="tipo" name="tipo">
+          <option value="todos" {% if not filtro_tipo or filtro_tipo == 'todos' %}selected{% endif %}>Todos</option>
+          <option value="receita" {% if filtro_tipo == 'receita' %}selected{% endif %}>Receita</option>
+          <option value="despesa" {% if filtro_tipo == 'despesa' %}selected{% endif %}>Despesa</option>
+        </select>
+      </div>
+      
+      <div class="col-md-3">
+        <label for="categoria" class="form-label"><i class="fas fa-tags me-2"></i>Categoria</label>
+        <select class="form-select" id="categoria" name="categoria">
+          <option value="todas" {% if not filtro_categoria or filtro_categoria == 'todas' %}selected{% endif %}>Todas</option>
+          {% for cat in categorias_disponiveis %}
+          <option value="{{ cat }}" {% if filtro_categoria == cat %}selected{% endif %}>{{ cat }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <div class="col-md-2">
+        <label for="data_inicial" class="form-label"><i class="fas fa-calendar-alt me-2"></i>Data Inicial</label>
+        <input type="date" class="form-control" id="data_inicial" name="data_inicial" value="{{ data_inicial_str or '' }}">
+      </div>
+      
+      <div class="col-md-2">
+        <label for="data_final" class="form-label"><i class="fas fa-calendar-alt me-2"></i>Data Final</label>
+        <input type="date" class="form-control" id="data_final" name="data_final" value="{{ data_final_str or '' }}">
+      </div>
+      
+      <div class="col-12">
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-check me-2"></i>Aplicar Filtros
+        </button>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+          <i class="fas fa-times me-2"></i>Limpar Filtros
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Melhorando alertas com ícones -->
+{% if saldo < 0 %}
+<div class="alert alert-danger" role="alert">
+  <i class="fas fa-exclamation-triangle me-2"></i>
+  <strong>Atenção!</strong> Seu saldo está negativo: R$ {{ saldo | round(2) }}. Atenção aos gastos!
+</div>
+{% endif %}
+
+{% if total_receitas > 0 and saldo > total_receitas * 0.5 %}
+<div class="alert alert-success" role="alert">
+  <i class="fas fa-check-circle me-2"></i>
+  <strong>Parabéns!</strong> Você poupou mais da metade da sua receita!
+</div>
+{% endif %}
+
+{% if relatorio_mensal %}
+<h3 class="mb-3"><i class="fas fa-calendar-check me-2"></i>Resumo Mensal</h3>
+<div class="table-responsive">
+  <table class="table table-bordered mb-4">
+    <thead class="table-light">
+      <tr>
+        <th><i class="fas fa-calendar me-2"></i>Mês/Ano</th>
+        <th><i class="fas fa-arrow-up me-2"></i>Receitas</th>
+        <th><i class="fas fa-arrow-down me-2"></i>Despesas</th>
+        <th><i class="fas fa-wallet me-2"></i>Saldo</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in relatorio_mensal %}
+      <tr>
+        <td>{{ r.mes_ano }}</td>
+        <td class="text-success">R$ {{ r.total_receitas | round(2) }}</td>
+        <td class="text-danger">R$ {{ r.total_despesas | round(2) }}</td>
+        <td class="fw-bold">R$ {{ r.saldo | round(2) }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<!-- Melhorando tabela de transações com responsividade e ícones -->
+<h3 class="mb-3"><i class="fas fa-list me-2"></i>Transações</h3>
+<div class="table-responsive">
+  <table class="table table-striped table-hover">
+    <thead class="table-light">
+      <tr>
+        <th><i class="fas fa-file-alt me-2"></i>Descrição</th>
+        <th><i class="fas fa-exchange-alt me-2"></i>Tipo</th>
+        <th><i class="fas fa-tag me-2"></i>Categoria</th>
+        <th><i class="fas fa-dollar-sign me-2"></i>Valor</th>
+        <th><i class="fas fa-calendar me-2"></i>Data</th>
+        <th><i class="fas fa-cog me-2"></i>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for t in transacoes %}
+      <tr>
+        <td>{{ t.descricao }}</td>
+        <td>
+          {% if t.tipo == 'receita' %}
+            <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>Receita</span>
+          {% else %}
+            <span class="badge bg-danger"><i class="fas fa-arrow-down me-1"></i>Despesa</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if t.categoria %}
+            <span class="badge bg-secondary">
+              <!-- Adicionando ícones por categoria -->
+              {% if t.categoria == 'Alimentação' %}
+                <i class="fas fa-utensils me-1"></i>
+              {% elif t.categoria == 'Transporte' %}
+                <i class="fas fa-car me-1"></i>
+              {% elif t.categoria == 'Moradia' %}
+                <i class="fas fa-home me-1"></i>
+              {% elif t.categoria == 'Saúde' %}
+                <i class="fas fa-heartbeat me-1"></i>
+              {% elif t.categoria == 'Educação' %}
+                <i class="fas fa-graduation-cap me-1"></i>
+              {% elif t.categoria == 'Lazer' %}
+                <i class="fas fa-gamepad me-1"></i>
+              {% elif t.categoria == 'Salário' %}
+                <i class="fas fa-money-bill-wave me-1"></i>
+              {% elif t.categoria == 'Investimentos' %}
+                <i class="fas fa-chart-line me-1"></i>
+              {% else %}
+                <i class="fas fa-tag me-1"></i>
+              {% endif %}
+              {{ t.categoria }}
+            </span>
+          {% else %}
+            <span class="badge bg-light text-dark"><i class="fas fa-question me-1"></i>Sem categoria</span>
+          {% endif %}
+        </td>
+        <td class="fw-bold">R$ {{ t.valor | round(2) }}</td>
+        <td>{{ t.data.strftime('%d/%m/%Y') }}</td>
+        <td>
+          <div class="btn-group btn-group-sm" role="group">
+            <a href="{{ url_for('editar_transacao', id=t.id) }}" class="btn btn-outline-primary" title="Editar">
+              <i class="fas fa-edit"></i>
+            </a>
+            <a href="{{ url_for('delete', id=t.id) }}" class="btn btn-outline-danger delete-btn" title="Excluir" data-id="{{ t.id }}">
+              <i class="fas fa-trash"></i>
+            </a>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if not transacoes %}
+<div class="alert alert-info text-center" role="alert">
+  <i class="fas fa-info-circle fa-2x mb-2"></i>
+  <p class="mb-0">Nenhuma transação encontrada. Comece adicionando uma nova transação!</p>
+</div>
+{% endif %}
+{% endblock %}

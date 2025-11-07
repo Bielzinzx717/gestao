@@ -13,8 +13,6 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.units import inch
 from flask_wtf.csrf import CSRFProtect
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 import re
 
 app = Flask(__name__)
@@ -27,12 +25,6 @@ app.config['WTF_CSRF_TIME_LIMIT'] = None
 db.init_app(app)
 login_manager.init_app(app)
 csrf = CSRFProtect(app)
-limiter = Limiter(
-    app=app,
-    key_func=get_remote_address,
-    default_limits=["200 per day", "50 per hour"],
-    storage_uri="memory://"
-)
 
 def validar_senha_forte(senha):
     """
@@ -82,7 +74,6 @@ def load_user(user_id):
 with app.app_context():
     db.create_all()
 
-
 @app.route('/')
 def home():
     if current_user.is_authenticated:
@@ -90,7 +81,6 @@ def home():
     return redirect(url_for('login'))
 
 @app.route('/register', methods=['GET', 'POST'])
-@limiter.limit("5 per hour")
 def register():
     if request.method == 'POST':
         nome = sanitizar_texto(request.form.get('nome', '').strip())
@@ -127,7 +117,6 @@ def register():
     return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
-@limiter.limit("10 per hour")
 def login():
     if request.method == 'POST':
         email = request.form.get('email', '').strip().lower()

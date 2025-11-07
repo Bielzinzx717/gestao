@@ -17,7 +17,7 @@ import re
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-key')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///finance.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://usuario:senha@host/banco'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['WTF_CSRF_ENABLED'] = True
 app.config['WTF_CSRF_TIME_LIMIT'] = None
@@ -662,3 +662,4 @@ def export_pdf():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
